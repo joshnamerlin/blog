@@ -1,0 +1,334 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Page</title>
+    <link rel="icon" type="image/png" href="{% static 'image.png' %}">
+    <style>
+        /* Base Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color:lightblue;
+            padding-bottom: 50px;
+        }
+
+        /* --- Header Section --- */
+        header {
+            margin-top: 10px; 
+            background-color:darkmagenta; /* Dark Magenta */
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Nav links at the corner */
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        /* --- Grid View Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* 3 columns in a row layout */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        /* --- Blog Card Layout --- */
+        .blog-card {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 180px;
+            background-color: #ddd;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .blog-title {
+            font-size: 1.2rem;
+            color: #333333;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .blog-snippet {
+            font-size: 0.9rem;
+            color: #666666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .read-more {
+            margin-top: auto;
+            color: #4A0E4E;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        /* --- FULL SCREEN PAGE TAKEOVER STYLES --- */
+        .hidden {
+            display: none !important;
+        }
+
+        /* This wrapper expands to 100% viewport width and height when active */
+        .full-page-takeover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: 100vh;
+            background-color: #ffffff; /* Turns entire screen background pristine white */
+            z-index: 9999; /* Forces it to sit cleanly on top of headers/grids */
+            padding: 0 0 60px 0;
+        }
+
+        /* The cover image spreads edge-to-edge seamlessly across the top */
+        .full-bleed-hero-img {
+            width: 100%;
+            height: 50vh; /* Takes up exactly half the screen height beautifully */
+            object-fit: cover;
+        }
+
+        /* Reading content layout control */
+        .reading-layout-box {
+            max-width: 800px; /* Keeps text lines at an easy-to-read width */
+            margin: -60px auto 0 auto; /* Overlaps content slightly onto the header image */
+            position: relative;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .back-action-btn {
+            background-color: #4A0E4E;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(74, 14, 78, 0.2);
+            transition: all 0.2s;
+        }
+
+        .back-action-btn:hover {
+            background-color: #330a36;
+            transform: translateX(-3px);
+        }
+
+        .full-post-title {
+            font-size: 2.5rem;
+            color: #111111;
+            margin-bottom: 25px;
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        .full-post-content {
+            font-size: 1.15rem;
+            color: #2c3e50;
+            line-height: 1.9;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            .blog-grid { grid-template-columns: repeat(2, 1fr); }
+            .reading-layout-box { margin: 20px; padding: 20px; }
+        }
+        @media (max-width: 600px) {
+            .blog-grid { grid-template-columns: 1fr; }
+            .full-bleed-hero-img { height: 35vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <h1 onclick="closePost()">Blog Page</h1>
+        <div class="nav-links">
+            <a href="#create">Create Your Blog</a>
+            <a href="#profile">Profile</a>
+        </div>
+    </header>
+
+    <div class="container" id="main-content-container">
+        <main class="blog-grid">
+            
+            <article class="blog-card" onclick="openPost(this)">
+                <img src="https://picsum.photos/1200/600?random=1" alt="Blog Image" class="blog-image">
+                <div class="card-content">
+                    <h2 class="blog-title">Exploring the Beauty of Nature</h2>
+                    <p class="blog-snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. You can write incredibly long stories right here inside your block, and it will stretch out beautifully across the whole browser frame when opened!</p>
+                    <span class="read-more">Read More →</span>
+                </div>
+            </article>
+
+            <article class="blog-card" onclick="openPost(this)">
+                <img src="https://picsum.photos/1200/600?random=2" alt="Blog Image" class="blog-image">
+                <div class="card-content">
+                    <h2 class="blog-title">The Future of AI Technology</h2>
+                    <p class="blog-snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                    <span class="read-more">Read More →</span>
+                </div>
+            </article>
+
+            <article class="blog-card" onclick="openPost(this)">
+                <img src="https://picsum.photos/1200/600?random=3" alt="Blog Image" class="blog-image">
+                <div class="card-content">
+                    <h2 class="blog-title">10 Minimalist Interior Design Tips</h2>
+                    <p class="blog-snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                    <span class="read-more">Read More →</span>
+                </div>
+            </article>
+
+            <article class="blog-card" onclick="openPost(this)">
+                <img src="https://picsum.photos/1200/600?random=4" alt="Blog Image" class="blog-image">
+                <div class="card-content">
+                    <h2 class="blog-title">Mastering Modern JavaScript</h2>
+                    <p class="blog-snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                    <span class="read-more">Read More →</span>
+                </div>
+            </article>
+
+            <article class="blog-card" onclick="openPost(this)">
+                <img src="https://picsum.photos/1200/600?random=5" alt="Blog Image" class="blog-image">
+                <div class="card-content">
+                    <h2 class="blog-title">Healthy Meals for Busy Weeks</h2>
+                    <p class="blog-snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                    <span class="read-more">Read More →</span>
+                </div>
+            </article>
+
+            <article class="blog-card" onclick="openPost(this)">
+                <img src="https://picsum.photos/1200/600?random=6" alt="Blog Image" class="blog-image">
+                <div class="card-content">
+                    <h2 class="blog-title">A Guide to Solo Traveling</h2>
+                    <p class="blog-snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                    <span class="read-more">Read More →</span>
+                </div>
+            </article>
+
+        </main>
+    </div>
+
+    <section id="full-post-section" class="full-page-takeover hidden">
+        <img id="target-image" src="" alt="Featured Cover Image" class="full-bleed-hero-img">
+        
+        <div class="reading-layout-box">
+            <button class="back-action-btn" onclick="closePost()">← Back to Articles</button>
+            <h2 id="target-title" class="full-post-title"></h2>
+            <div id="target-content" class="full-post-content"></div>
+        </div>
+    </section>
+
+    <script>
+        const mainHeader = document.getElementById('main-header');
+        const mainContainer = document.getElementById('main-content-container');
+        const fullSection = document.getElementById('full-post-section');
+        
+        const targetImage = document.getElementById('target-image');
+        const targetTitle = document.getElementById('target-title');
+        const targetContent = document.getElementById('target-content');
+
+        function openPost(cardElement) {
+            // Scrape text and dynamic high-res photos
+            const titleText = cardElement.querySelector('.blog-title').innerText;
+            const snippetText = cardElement.querySelector('.blog-snippet').innerText;
+            const imageSrc = cardElement.querySelector('.blog-image').src;
+
+            // Load data into target positions
+            targetTitle.innerText = titleText;
+            targetImage.src = imageSrc;
+            targetContent.innerText = snippetText;
+
+            // Hide normal view and header completely to let article take over 100% space
+            mainHeader.classList.add('hidden');
+            mainContainer.classList.add('hidden');
+            fullSection.classList.remove('hidden');
+
+            // Force instant snap up to the top of the browser screen
+            window.scrollTo(0, 0);
+        }
+
+        function closePost() {
+            // Restore everything back to normal card mode
+            fullSection.classList.add('hidden');
+            mainHeader.classList.remove('hidden');
+            mainContainer.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
